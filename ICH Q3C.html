@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICH Q3C(R9) Residual Solvents Tool</title>
+    <style>
+        :root {
+            --class1: #e74c3c;
+            --class2: #f39c12;
+            --class3: #2ecc71;
+            --class4: #95a5a6;
+            --bg: #f4f7f6;
+            --card: #ffffff;
+            --text: #2c3e50;
+            --border: #dcdde1;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+        h1 { margin: 0; font-size: 1.8rem; color: #34495e; }
+        .subtitle { font-size: 0.9rem; color: #7f8c8d; }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: var(--card);
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+            transition: 0.2s;
+        }
+        .tab-btn.active { background: #3498db; color: white; }
+        .tab-content { display: none; background: var(--card); padding: 20px; border-radius: 0 8px 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .tab-content.active { display: block; }
+
+        .card { background: var(--card); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .card h3 { margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 8px; }
+        
+        input, select, button {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+            margin: 5px 0;
+        }
+        input:focus, select:focus { outline: 2px solid #3498db; border-color: transparent; }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        button:hover { background: #2980b9; }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-success { background: #2ecc71; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: #f8f9fa; position: sticky; top: 0; }
+        .badge { padding: 4px 8px; border-radius: 12px; color: white; font-size: 0.8rem; font-weight: bold; }
+        .badge-1 { background: var(--class1); }
+        .badge-2 { background: var(--class2); }
+        .badge-3 { background: var(--class3); }
+        .badge-4 { background: var(--class4); }
+
+        .result-box {
+            background: #e8f4f8;
+            border-left: 5px solid #3498db;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+        .result-box.fail { border-left-color: #e74c3c; background: #fdedeb; }
+        .result-box.pass { border-left-color: #2ecc71; background: #eafaf1; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+        .formula-note { font-size: 0.8rem; color: #7f8c8d; font-style: italic; margin-top: 5px; }
+        .dynamic-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+        .dynamic-row input { flex: 1; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>ICH Q3C(R9) Residual Solvents Tool</h1>
+    <div class="subtitle">Impurities: Guideline for Residual Solvents | Current Step 4 version dated 24 January 2024</div>
+</header>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="openTab(event, 'Database')">1. Solvent Database</button>
+    <button class="tab-btn" onclick="openTab(event, 'Limits')">2. Limits Calculator (Opt 1 & 2)</button>
+    <button class="tab-btn" onclick="openTab(event, 'PDE')">3. PDE Derivation Calculator</button>
+</div>
+
+<!-- TAB 1: DATABASE -->
+<div id="Database" class="tab-content active">
+    <div class="card">
+        <h3>Search Solvents</h3>
+        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search by name, class, or concern..." style="width: 100%; margin-bottom: 10px;">
+        <div style="overflow-x: auto; max-height: 60vh; overflow-y: auto;">
+            <table id="solventTable">
+                <thead>
+                    <tr>
+                        <th>Solvent</th>
+                        <th>Class</th>
+                        <th>PDE (mg/day)</th>
+                        <th>Conc. Limit (ppm)</th>
+                        <th>Concern / Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- TAB 2: LIMITS CALCULATOR -->
+<div id="Limits" class="tab-content">
+    <div class="grid-2">
+        <!-- Option 1 -->
+        <div class="card">
+            <h3>Option 1: Concentration Limit (ppm)</h3>
+            <p class="formula-note">Formula: Conc (ppm) = (1000 × PDE) / Daily Dose (g)</p>
+            <label>Select Class 2 Solvent:</label>
+            <select id="opt1_solvent" style="width: 100%;"></select>
+            
+            <label>Daily Dose of Drug Product (g):</label>
+            <input type="number" id="opt1_dose" value="10" step="0.1" style="width: 100%;">
+            
+            <button onclick="calcOption1()" style="width: 100%; margin-top: 10px;">Calculate Limit</button>
+            <div id="opt1_result" class="result-box" style="display:none;"></div>
+        </div>
+
+        <!-- Option 2 -->
+        <div class="card">
+            <h3>Option 2: Summation of Daily Exposure</h3>
+            <p class="formula-note">Sum of (Weight × Conc) must be ≤ PDE</p>
+            <label>Select Class 2 Solvent:</label>
+            <select id="opt2_solvent" style="width: 100%;"></select>
+            
+            <div id="opt2_rows" style="margin-top: 15px;"></div>
+            <button onclick="addOpt2Row()" class="btn-success" style="width: 100%; margin-top: 10px;">+ Add Component</button>
+            <button onclick="calcOption2()" style="width: 100%; margin-top: 10px;">Calculate Total Exposure</button>
+            <div id="opt2_result" class="result-box" style="display:none;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TAB 3: PDE CALCULATOR -->
+<div id="PDE" class="tab-content">
+    <div class="card">
+        <h3>PDE Derivation Calculator</h3>
+        <p class="formula-note">PDE = (NOEL × 50 kg) / (F1 × F2 × F3 × F4 × F5)</p>
+        
+        <div class="grid-2">
+            <div>
+                <label>Data Source Type:</label>
+                <select id="pde_source" onchange="toggleInhalation()" style="width: 100%;">
+                    <option value="oral">Oral / Direct (mg/kg/day)</option>
+                    <option value="inhalation">Inhalation (ppm to mg/kg/day)</option>
+                </select>
+
+                <div id="inhalation_inputs" style="display: none; margin-top: 10px; border-left: 3px solid #3498db; padding-left: 10px;">
+                    <label>Concentration (ppm):</label>
+                    <input type="number" id="in_ppm" step="0.01" style="width: 100%;">
+                    <label>Molecular Weight (g/mol):</label>
+                    <input type="number" id="in_mw" step="0.01" style="width: 100%;">
+                    <label>Species:</label>
+                    <select id="in_species" style="width: 100%;">
+                        <option value="rat">Rat (BW: 0.425kg, Resp: 290 L/d)</option>
+                        <option value="mouse">Mouse (BW: 0.028kg, Resp: 43 L/d)</option>
+                    </select>
+                    <div class="grid-2">
+                        <div>
+                            <label>Hours/Day:</label>
+                            <input type="number" id="in_hours" value="6" style="width: 100%;">
+                        </div>
+                        <div>
+                            <label>Days/Week:</label>
+                            <input type="number" id="in_days" value="5" style="width: 100%;">
+                        </div>
+                    </div>
+                </div>
+
+                <label style="margin-top: 10px;">NOEL or LOEL (mg/kg/day):</label>
+                <input type="number" id="pde_noel" step="0.01" style="width: 100%;">
+                <span id="calc_dose_display" style="font-size: 0.9rem; color: #2980b9;"></span>
+            </div>
+
+            <div>
+                <label>F1 (Species Extrapolation):</label>
+                <select id="pde_f1" style="width: 100%;">
+                    <option value="5">Rat to Human (5)</option>
+                    <option value="12">Mouse to Human (12)</option>
+                    <option value="2">Dog to Human (2)</option>
+                    <option value="2.5">Rabbit to Human (2.5)</option>
+                    <option value="3">Monkey to Human (3)</option>
+                    <option value="10">Other to Human (10)</option>
+                </select>
+
+                <label>F2 (Individual Variability):</label>
+                <input type="number" id="pde_f2" value="10" style="width: 100%;" readonly>
+                <p class="formula-note">Fixed at 10 for organic solvents.</p>
+
+                <label>F3 (Short-term Exposure):</label>
+                <select id="pde_f3" style="width: 100%;">
+                    <option value="1">≥ 1/2 lifetime / Reproductive (1)</option>
+                    <option value="2">6-mo rodent / 3.5-yr non-rodent (2)</option>
+                    <option value="5" selected>3-mo rodent / 2-yr non-rodent (5)</option>
+                    <option value="10">&lt; 3-mo rodent (10)</option>
+                </select>
+
+                <label>F4 (Severe Toxicity):</label>
+                <select id="pde_f4" style="width: 100%;">
+                    <option value="1" selected>No severe toxicity (1)</option>
+                    <option value="5">Fetal tox w/ maternal / Teratogenic w/ maternal (5)</option>
+                    <option value="10">Non-genotoxic carcinogenicity / Teratogenic w/o maternal (10)</option>
+                </select>
+
+                <label>F5 (LOEL applied?):</label>
+                <select id="pde_f5" style="width: 100%;">
+                    <option value="1" selected>NOEL established (1)</option>
+                    <option value="5">LOEL used, moderate severity (5)</option>
+                    <option value="10">LOEL used, high severity (10)</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="calcPDE()" style="width: 100%; margin-top: 20px; font-size: 1.1rem; padding: 12px;">Calculate PDE</button>
+        <div id="pde_result" class="result-box" style="display:none;"></div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // DATA: ICH Q3C(R9) Solvents
+    // ==========================================
+    const solvents = [
+        // Class 1
+        { name: "Benzene", class: 1, pde: "-", limit: 2, concern: "Carcinogen" },
+        { name: "Carbon tetrachloride", class: 1, pde: "-", limit: 4, concern: "Toxic and environmental hazard" },
+        { name: "1,2-Dichloroethane", class: 1, pde: "-", limit: 5, concern: "Toxic" },
+        { name: "1,1-Dichloroethene", class: 1, pde: "-", limit: 8, concern: "Toxic" },
+        { name: "1,1,1-Trichloroethane", class: 1, pde: "-", limit: 1500, concern: "Environmental hazard" },
+        
+        // Class 2
+        { name: "Acetonitrile", class: 2, pde: 4.1, limit: 410, concern: "" },
+        { name: "Chlorobenzene", class: 2, pde: 3.6, limit: 360, concern: "" },
+        { name: "Chloroform", class: 2, pde: 0.6, limit: 60, concern: "" },
+        { name: "Cumene", class: 2, pde: 0.7, limit: 70, concern: "Revised Q3C(R5)" },
+        { name: "Cyclohexane", class: 2, pde: 38.8, limit: 3880, concern: "" },
+        { name: "Cyclopentyl methyl ether (CPME)", class: 2, pde: 15.0, limit: 1500, concern: "Revised Q3C(R8)" },
+        { name: "1,2-Dichloroethene", class: 2, pde: 18.7, limit: 1870, concern: "" },
+        { name: "Dichloromethane", class: 2, pde: 6.0, limit: 600, concern: "" },
+        { name: "1,2-Dimethoxyethane", class: 2, pde: 1.0, limit: 100, concern: "" },
+        { name: "N,N-Dimethylacetamide (DMA)", class: 2, pde: 10.9, limit: 1090, concern: "" },
+        { name: "N,N-Dimethylformamide (DMF)", class: 2, pde: 8.8, limit: 880, concern: "" },
+        { name: "1,4-Dioxane", class: 2, pde: 3.8, limit: 380, concern: "" },
+        { name: "2-Ethoxyethanol", class: 2, pde: 1.6, limit: 160, concern: "" },
+        { name: "Ethyleneglycol", class: 2, pde: 6.2, limit: 620, concern: "Corrected Q3C(R7)" },
+        { name: "Formamide", class: 2, pde: 2.2, limit: 220, concern: "" },
+        { name: "Hexane", class: 2, pde: 2.9, limit: 290, concern: "" },
+        { name: "Methanol", class: 2, pde: 30.0, limit: 3000, concern: "" },
+        { name: "2-Methoxyethanol", class: 2, pde: 0.5, limit: 50, concern: "" },
+        { name: "Methylbutyl ketone", class: 2, pde: 0.5, limit: 50, concern: "" },
+        { name: "Methylcyclohexane", class: 2, pde: 11.8, limit: 1180, concern: "" },
+        { name: "Methylisobutylketone (MIBK)", class: 2, pde: 45, limit: 4500, concern: "Revised Q3C(R6)" },
+        { name: "N-Methylpyrrolidone (NMP)", class: 2, pde: 5.3, limit: 530, concern: "Revised Q3C(R2)" },
+        { name: "Nitromethane", class: 2, pde: 0.5, limit: 50, concern: "" },
+        { name: "Pyridine", class: 2, pde: 2.0, limit: 200, concern: "" },
+        { name: "Sulfolane", class: 2, pde: 1.6, limit: 160, concern: "" },
+        { name: "Tertiary-butyl alcohol (TBA)", class: 2, pde: 35, limit: 3500, concern: "Revised Q3C(R8)" },
+        { name: "Tetrahydrofuran (THF)", class: 2, pde: 7.2, limit: 720, concern: "Revised Q3C(R1)" },
+        { name: "Tetralin", class: 2, pde: 1.0, limit: 100, concern: "" },
+        { name: "Toluene", class: 2, pde: 8.9, limit: 890, concern: "" },
+        { name: "1,1,2-Trichloroethene", class: 2, pde: 0.8, limit: 80, concern: "" },
+        { name: "Xylene", class: 2, pde: 21.7, limit: 2170, concern: "" },
+
+        // Class 3 (Representative subset, PDE >= 50, Limit 5000 ppm)
+        { name: "Acetic acid", class: 3, pde: "≥50", limit: 5000, concern: "GMP / Quality-based" },
+        { name: "Acetone", class: 3, pde: "≥50", limit: 5000, concern: "GMP / Quality-based" },
+        { name: "Anisole", class: 3, pde: "≥50", limit: 5000, concern: "GMP / Quality-based" },
+        { name: "1-Butanol", class: 3, pde: "≥50", limit: 5000, concern: "GMP / Quality-based" },
+        { name: "2-Butanol", class: 3, pde: "≥50", limit: 5000, concern: "GMP / Quality-based" },
+        { name: "Dimethyl sulfoxide (DMSO)", class: 3, pde: "≥50", limit: 5000, concern: "GMP / Quality-based" },
+        { name: "Ethanol", class: 3, pde: "≥50", limit: 5000, concern: "GMP / Quality-based" },
+        { name: "Ethyl acetate", class: 3, pde: "≥50", limit: 5000, concern: "GMP / Quality-based" },
+        { name: "Heptane", class: 3, pde: "≥50", limit: 5000, concern: "GMP / Quality-based" },
+        { name: "2-Methyltetrahydrofuran (2-MTHF)", class: 3, pde: 50, limit: 5000, concern: "Revised Q3C(R8)" },
+        { name: "Pentane", class: 3, pde: "≥50", limit: 5000, concern: "GMP / Quality-based" },
+        { name: "Triethylamine (TEA)", class: 3, pde: 62.5, limit: 5000, concern: "Revised Q3C(R6)" },
+    ];
+
+    // ==========================================
+    // UI LOGIC
+    // ==========================================
+    function openTab(evt, tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        evt.currentTarget.classList.add('active');
+    }
+
+    // Populate Database Table
+    function renderTable(data) {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        data.forEach(s => {
+            const badgeClass = `badge-${s.class}`;
+            const limitStr = s.limit === 5000 ? "5000 (0.5%)" : s.limit;
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${s.name}</strong></td>
+                    <td><span class="badge ${badgeClass}">Class ${s.class}</span></td>
+                    <td>${s.pde}</td>
+                    <td>${limitStr}</td>
+                    <td>${s.concern}</td>
+                </tr>
+            `;
+        });
+    }
+    
+    function filterTable() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = solvents.filter(s => 
+            s.name.toLowerCase().includes(query) || 
+            s.class.toString().includes(query) || 
+            s.concern.toLowerCase().includes(query)
+        );
+        renderTable(filtered);
+    }
+    renderTable(solvents);
+
+    // Populate Selects for Calculators
+    const class2Solvents = solvents.filter(s => s.class === 2);
+    function populateSelects() {
+        const opts = class2Solvents.map(s => `<option value="${s.pde}">${s.name} (PDE: ${s.pde} mg/d)</option>`).join('');
+        document.getElementById('opt1_solvent').innerHTML = opts;
+        document.getElementById('opt2_solvent').innerHTML = opts;
+    }
+    populateSelects();
+
+    // ==========================================
+    // CALCULATOR 1: OPTION 1
+    // ==========================================
+    function calcOption1() {
+        const pde = parseFloat(document.getElementById('opt1_solvent').value);
+        const dose = parseFloat(document.getElementById('opt1_dose').value);
+        const resBox = document.getElementById('opt1_result');
+        
+        if (!dose || dose <= 0) {
+            resBox.style.display = 'block';
+            resBox.className = 'result-box fail';
+            resBox.innerText = 'Please enter a valid daily dose.';
+            return;
+        }
+
+        const limit = (1000 * pde) / dose;
+        resBox.style.display = 'block';
+        resBox.className = 'result-box pass';
+        resBox.innerHTML = `
+            <strong>Option 1 Concentration Limit:</strong> ${limit.toFixed(2)} ppm<br>
+            <span style="font-size: 0.9rem;">(Calculated as 1000 × ${pde} / ${dose})</span>
+        `;
+    }
+
+    // ==========================================
+    // CALCULATOR 2: OPTION 2
+    // ==========================================
+    let opt2RowCount = 0;
+    function addOpt2Row() {
+        opt2RowCount++;
+        const container = document.getElementById('opt2_rows');
+        const row = document.createElement('div');
+        row.className = 'dynamic-row';
+        row.id = `row_${opt2RowCount}`;
+        row.innerHTML = `
+            <input type="text" placeholder="Component Name" style="flex: 2;">
+            <input type="number" placeholder="Weight (g)" step="0.01" class="opt2-weight">
+            <input type="number" placeholder="Conc (ppm)" step="0.1" class="opt2-conc">
+            <button class="btn-danger" onclick="document.getElementById('row_${opt2RowCount}').remove()">×</button>
+        `;
+        container.appendChild(row);
+    }
+    addOpt2Row(); // Add initial row
+
+    function calcOption2() {
+        const pde = parseFloat(document.getElementById('opt2_solvent').value);
+        const rows = document.querySelectorAll('.dynamic-row');
+        let totalExposure = 0;
+        let details = [];
+
+        rows.forEach(row => {
+            const inputs = row.querySelectorAll('input');
+            const name = inputs[0].value || 'Unnamed';
+            const weight = parseFloat(inputs[1].value) || 0;
+            const conc = parseFloat(inputs[2].value) || 0;
+            
+            const dailyExp = (weight * conc) / 1000000; // ppm to mg
+            totalExposure += dailyExp;
+            details.push(`${name}: ${dailyExp.toFixed(4)} mg/day`);
+        });
+
+        const resBox = document.getElementById('opt2_result');
+        resBox.style.display = 'block';
+        const isPass = totalExposure <= pde;
+        resBox.className = `result-box ${isPass ? 'pass' : 'fail'}`;
+        
+        resBox.innerHTML = `
+            <strong>Total Daily Exposure:</strong> ${totalExposure.toFixed(4)} mg/day<br>
+            <strong>PDE Limit:</strong> ${pde} mg/day<br>
+            <strong>Status:</strong> ${isPass ? '✅ COMPLIANT (≤ PDE)' : '❌ EXCEEDS PDE'}<br>
+            <hr style="margin: 10px 0; border: 0; border-top: 1px dashed #ccc;">
+            <strong>Breakdown:</strong><br>
+            ${details.join('<br>')}
+        `;
+    }
+
+    // ==========================================
+    // CALCULATOR 3: PDE DERIVATION
+    // ==========================================
+    function toggleInhalation() {
+        const src = document.getElementById('pde_source').value;
+        document.getElementById('inhalation_inputs').style.display = src === 'inhalation' ? 'block' : 'none';
+    }
+
+    function calcPDE() {
+        const src = document.getElementById('pde_source').value;
+        let noel_mg_kg = 0;
+        let conversionNote = "";
+
+        if (src === 'inhalation') {
+            const ppm = parseFloat(document.getElementById('in_ppm').value);
+            const mw = parseFloat(document.getElementById('in_mw').value);
+            const species = document.getElementById('in_species').value;
+            const hours = parseFloat(document.getElementById('in_hours').value);
+            const days = parseFloat(document.getElementById('in_days').value);
+
+            if (!ppm || !mw) {
+                alert("Please enter ppm and Molecular Weight.");
+                return;
+            }
+
+            // Constants from ICH Q3C Appendix 3
+            const respVol = species === 'rat' ? 290 : 43; // L/day
+            const bw = species === 'rat' ? 0.425 : 0.028; // kg
+            
+            const mg_m3 = (ppm * mw) / 24.45;
+            const mg_L = mg_m3 / 1000;
+            const continuous_mg_L = mg_L * (hours / 24) * (days / 7);
+            noel_mg_kg = (continuous_mg_L * respVol) / bw;
+            
+            conversionNote = `
+                <strong>Inhalation Conversion Steps:</strong><br>
+                1. mg/m³ = (${ppm} × ${mw}) / 24.45 = ${mg_m3.toFixed(4)}<br>
+                2. mg/L = ${mg_m3.toFixed(4)} / 1000 = ${mg_L.toFixed(6)}<br>
+                3. Continuous mg/L = ${mg_L.toFixed(6)} × (${hours}/24) × (${days}/7) = ${continuous_mg_L.toFixed(6)}<br>
+                4. Daily Dose = (${continuous_mg_L.toFixed(6)} × ${respVol}) / ${bw} = <strong>${noel_mg_kg.toFixed(4)} mg/kg/day</strong><br>
+                <hr style="margin: 10px 0; border: 0; border-top: 1px dashed #ccc;">
+            `;
+        } else {
+            noel_mg_kg = parseFloat(document.getElementById('pde_noel').value);
+        }
+
+        if (!noel_mg_kg) {
+            alert("Please enter a valid NOEL/LOEL or inhalation data.");
+            return;
+        }
+
+        const f1 = parseFloat(document.getElementById('pde_f1').value);
+        const f2 = parseFloat(document.getElementById('pde_f2').value);
+        const f3 = parseFloat(document.getElementById('pde_f3').value);
+        const f4 = parseFloat(document.getElementById('pde_f4').value);
+        const f5 = parseFloat(document.getElementById('pde_f5').value);
+        
+        const weightAdj = 50; // kg
+        const pde = (noel_mg_kg * weightAdj) / (f1 * f2 * f3 * f4 * f5);
+        const opt1_limit_10g = (1000 * pde) / 10;
+
+        const resBox = document.getElementById('pde_result');
+        resBox.style.display = 'block';
+        resBox.className = 'result-box pass';
+        resBox.innerHTML = `
+            ${conversionNote}
+            <strong>PDE Formula:</strong> (${noel_mg_kg.toFixed(4)} × 50) / (${f1} × ${f2} × ${f3} × ${f4} × ${f5})<br>
+            <strong>Calculated PDE:</strong> <span style="font-size: 1.3rem; color: #2980b9;">${pde.toFixed(2)} mg/day</span><br>
+            <strong>Classification:</strong> ${pde >= 50 ? '<span class="badge badge-3">Class 3 (Low Toxic Potential)</span>' : '<span class="badge badge-2">Class 2 (To Be Limited)</span>'}<br>
+            <strong>Option 1 Limit (assuming 10g dose):</strong> ${opt1_limit_10g.toFixed(2)} ppm
+        `;
+    }
+</script>
+
+</body>
+</html>
