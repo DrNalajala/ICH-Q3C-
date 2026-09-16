@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICH Q3C(R9) Residual Solvents — Interactive Toolkit</title>
+<style>
+:root{
+  --bg:#f1f5f9; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+  --line:#e2e8f0; --brand:#0f766e; --brand2:#155e75; --brand-ink:#ffffff;
+  --ok:#15803d; --ok-bg:#f0fdf4; --ok-line:#bbf7d0;
+  --fail:#b91c1c; --fail-bg:#fef2f2; --fail-line:#fecaca;
+  --info:#0369a1; --info-bg:#f0f9ff; --info-line:#bae6fd;
+  --c1:#dc2626; --c1-bg:#fee2e2; --c2:#d97706; --c2-bg:#fef3c7;
+  --c3:#16a34a; --c3-bg:#dcfce7; --c4:#64748b; --c4-bg:#e2e8f0;
+  --shadow:0 1px 3px rgba(15,23,42,.08),0 4px 14px rgba(15,23,42,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+.hero{background:linear-gradient(120deg,#134e4a 0%,#0f766e 45%,#155e75 100%);color:#fff;padding:34px 28px 30px}
+.hero h1{margin:0 0 6px;font-size:26px;letter-spacing:.2px}
+.hero p{margin:4px 0;opacity:.92;max-width:980px}
+.chips{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);padding:3px 12px;border-radius:999px;font-size:12.5px}
+nav.tabs{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 2px 8px rgba(15,23,42,.06);padding:0 16px;display:flex;gap:2px;overflow-x:auto}
+nav.tabs button{appearance:none;border:0;background:transparent;padding:14px 16px 12px;font-size:14.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+nav.tabs button:hover{color:var(--brand)}
+nav.tabs button.active{color:var(--brand);border-bottom-color:var(--brand)}
+main{max-width:1180px;margin:0 auto;padding:26px 20px 60px}
+.panel{display:none;animation:fade .25s ease}
+.panel.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h2.sec{margin:4px 0 14px;font-size:21px;color:#0f172a}
+h3.sub{margin:26px 0 10px;font-size:16.5px;color:var(--brand2)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:0 0 18px;box-shadow:var(--shadow)}
+.card p{margin:8px 0}
+.lead{color:var(--muted);font-size:14.5px;margin-top:6px}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.3px}
+.b-c1{background:var(--c1-bg);color:var(--c1)} .b-c2{background:var(--c2-bg);color:var(--c2)} .b-c3{background:var(--c3-bg);color:var(--c3)} .b-c4{background:var(--c4-bg);color:var(--c4)} .b-meta{background:#e0f2fe;color:#0369a1}
+.classgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.classgrid .mini{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#f8fafc}
+.classgrid .mini h4{margin:8px 0 6px;font-size:14.5px}
+.classgrid .mini p{margin:0;font-size:13.5px;color:#334155}
+.formula{background:#f8fafc;border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:8px;padding:12px 16px;font-family:var(--mono);font-size:14.5px;margin:10px 0;overflow-x:auto}
+.formula small{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--muted)}
+table{width:100%;border-collapse:collapse;background:#fff;font-size:14px}
+th{background:#f1f5f9;color:#334155;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.4px;padding:9px 12px;border-bottom:2px solid var(--line)}
+td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even){background:#f8fafc}
+tbody tr:hover{background:#ecfeff}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.twocol{grid-template-columns:1fr}}
+.factbox{border-left:4px solid var(--info);background:var(--info-bg);padding:10px 14px;border-radius:0 8px 8px 0;font-size:14px;margin:12px 0}
+.factbox b{color:var(--info)}
+.note{font-size:12.5px;color:var(--muted);margin-top:10px}
+ul.clean{margin:8px 0;padding-left:20px}
+ul.clean li{margin:5px 0}
+.searchbar{max-width:420px;width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:10px;font-size:14.5px;margin:4px 0 16px;outline:none}
+.searchbar:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(15,118,110,.15)}
+input[type=number],select{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px;background:#fff;outline:none}
+input[type=number]:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(15,118,110,.15)}
+select{width:100%}
+button.btn{appearance:none;border:0;cursor:pointer;font-size:14px;font-weight:600;border-radius:9px;padding:9px 16px;transition:filter .15s}
+button.btn:active{transform:translateY(1px)}
+.btn-p{background:var(--brand);color:#fff} .btn-p:hover{filter:brightness(1.08)}
+.btn-s{background:#f1f5f9;color:#334155;border:1px solid var(--line)} .btn-s:hover{background:#e2e8f0}
+.btn-sm{padding:5px 10px;font-size:12.5px;border-radius:7px}
+.lbl{display:block;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.4px;margin:10px 0 4px}
+.result{border-radius:10px;padding:12px 16px;font-size:14.5px;margin-top:14px;display:none}
+.result.show{display:block}
+.result.ok{background:var(--ok-bg);border:1px solid var(--ok-line);color:#14532d}
+.result.fail{background:var(--fail-bg);border:1px solid var(--fail-line);color:#7f1d1d}
+.result.info{background:var(--info-bg);border:1px solid var(--info-line);color:#0c4a6e}
+.work{font-family:var(--mono);font-size:13.5px;background:#fff;border:1px dashed var(--line);border-radius:8px;padding:10px 12px;margin-top:10px;white-space:pre-wrap;color:#334155}
+.rows-table{width:100%}
+.rows-table input{width:100%;padding:8px 10px;font-size:13.5px}
+.caseh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.caseh h4{margin:0;font-size:16px;color:#0f172a}
+.caseh .tag{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:#e0f2fe;color:#0369a1;white-space:nowrap}
+.caseh .tag.t2{background:var(--c2-bg);color:var(--c2)} .caseh .tag.t3{background:var(--c3-bg);color:var(--c3)} .caseh .tag.red{background:var(--c1-bg);color:var(--c1)}
+.casedata{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:12px 0}
+.casedata div{background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:13px}
+.casedata b{display:block;font-size:15px;color:var(--brand2);font-family:var(--mono)}
+.casedata span{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.4px}
+.caseflow{background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:12px 14px;font-family:var(--mono);font-size:13px;white-space:pre-wrap;color:#334155;margin:10px 0}
+footer{max-width:1180px;margin:0 auto;padding:18px 20px 40px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+.fdiv{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🧪 ICH Q3C(R9) — Residual Solvents Interactive Toolkit</h1>
+  <p>Impurities: Guideline for Residual Solvents (ICH Harmonised Guideline · Current Step 4 version, 24 January 2024).</p>
+  <p>Guidelines, calculators, worked examples and case studies built directly from the official Q3C(R9) document (incl. PDE derivations in Parts II–VI).</p>
+  <div class="chips">
+    <span class="chip">Step 4 · 24 Jan 2024</span>
+    <span class="chip">R9 minor revision: solvent volatility (Section 3.4)</span>
+    <span class="chip">Class 1 · 2 · 3 + Table 4</span>
+    <span class="chip">PDE-based limits</span>
+  </div>
+</div>
+
+<nav class="tabs" id="tabbar">
+  <button class="active" onclick="showTab('guidelines')">📘 Guidelines</button>
+  <button onclick="showTab('tables')">🗂️ Solvent Tables</button>
+  <button onclick="showTab('calculators')">🧮 Calculators</button>
+  <button onclick="showTab('cases')">📚 Case Studies</button>
+  <button onclick="showTab('refs')">📎 References &amp; History</button>
+</nav>
+
+<main>
+<!-- ===================== PART 1 TAB: GUIDELINES ===================== -->
+<div class="panel active" id="panel-guidelines">
+  <h2 class="sec">Guidelines — how residual-solvent control works</h2>
+
+  <div class="card">
+    <h3 class="sub" style="margin-top:0">Purpose &amp; scope</h3>
+    <p>ICH Q3C recommends <b>acceptable amounts of residual solvents</b> in pharmaceuticals for patient safety. Residual solvents are <b>organic volatile chemicals used or produced in the manufacture of drug substances or excipients, or in the preparation of drug products</b>, that are not completely removed by practical manufacturing techniques.</p>
+    <ul class="clean">
+      <li>Applies to drug substances, excipients and drug products — test only for solvents <b>used or produced</b> in manufacture/purification.</li>
+      <li>A <b>cumulative method</b> may be used to calculate drug-product levels from ingredient levels; if the calculated level is ≤ the recommended limit, no drug-product testing is needed.</li>
+      <li>Does <b>not</b> apply to clinical-research-stage materials or existing marketed products; all dosage forms and routes are in scope.</li>
+      <li>Higher levels may be acceptable for short-term use (≤30 days) or topical application — justified case by case.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3 class="sub" style="margin-top:0">Classification of residual solvents (Section 3.1)</h3>
+    <div class="classgrid">
+      <div class="mini"><span class="badge b-c1">CLASS 1</span><h4>Solvents to be avoided</h4><p>Known or strongly suspected human carcinogens, and environmental hazards. May only be used with strong risk–benefit justification; limits per Table 1.</p></div>
+      <div class="mini"><span class="badge b-c2">CLASS 2</span><h4>Solvents to be limited</h4><p>Non-genotoxic animal carcinogens, agents of other irreversible toxicity (neurotoxicity, teratogenicity), or other significant but reversible toxicities. Limited via PDE (Table 2).</p></div>
+      <div class="mini"><span class="badge b-c3">CLASS 3</span><h4>Low toxic potential</h4><p>≤ 50 mg/day acceptable without justification (5000 ppm / 0.5% under Option 1); higher amounts allowed if realistic vs. manufacturing capability &amp; GMP (Table 3).</p></div>
+      <div class="mini"><span class="badge b-c4">TABLE 4</span><h4>No adequate toxicological data</h4><p>May be of interest, but no PDE could be based on the data. <b>Manufacturers must justify</b> residual levels of these solvents.</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub" style="margin-top:0">Key concept: Permitted Daily Exposure (PDE)</h3>
+    <p>PDE is the <b>pharmaceutically acceptable intake of a residual solvent per day</b> (mg/day). It is derived from the NOEL (or LOEL) of the most relevant animal study (Appendix 3):</p>
+    <div class="formula">PDE (mg/day) = (NOEL or LOEL (mg/kg/day) × body-weight adjustment (kg)) / (F1 × F2 × F3 × F4 × F5)</div>
+    <p>Body weight is taken as an <b>arbitrary 50 kg</b> (adds a built-in safety margin vs. 60–70 kg; a lower weight should be used for pediatric products). 100% systemic exposure is assumed regardless of route. Modifying factors:</p>
+    <div class="twocol">
+      <div>
+        <table>
+          <tr><th>F1 — species extrapolation</th><th>Value</th></tr>
+          <tr><td>Rat → human</td><td>5</td></tr>
+          <tr><td>Mouse → human</td><td>12</td></tr>
+          <tr><td>Dog → human</td><td>2</td></tr>
+          <tr><td>Rabbit → human</td><td>2.5</td></tr>
+          <tr><td>Monkey → human</td><td>3</td></tr>
+          <tr><td>Other animals → human</td><td>10</td></tr>
+        </table>
+        <p class="note">F2 = 10: inter-individual variability (used consistently for all organic solvents). F5 = 1 if a NOEL was established; up to 10 if only an LOEL is available (severity-dependent).</p>
+      </div>
+      <div>
+        <table>
+          <tr><th>F3 — study duration</th><th>Value</th></tr>
+          <tr><td>≥ half lifetime (1 yr rodent/rabbit; 7 yr cat/dog/monkey); repro studies covering full organogenesis</td><td>1</td></tr>
+          <tr><td>6-month rodent / 3.5-year non-rodent</td><td>2</td></tr>
+          <tr><td>3-month rodent / 2-year non-rodent</td><td>5</td></tr>
+          <tr><td>Shorter duration</td><td>10</td></tr>
+        </table>
+        <table style="margin-top:10px">
+          <tr><th>F4 — severity of toxicity</th><th>Value</th></tr>
+          <tr><td>No severe toxicity; fetal toxicity with maternal toxicity</td><td>1</td></tr>
+          <tr><td>Fetal toxicity without maternal toxicity; teratogenic effect with maternal toxicity; non-genotoxic carcinogenicity / neurotoxicity / teratogenicity</td><td>5</td></tr>
+          <tr><td>Teratogenic effect without maternal toxicity; oncogenic effect</td><td>10</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub" style="margin-top:0">Two options for Class 2 limits (Section 3.3)</h3>
+    <div class="formula">Concentration (ppm) = (1000 × PDE (mg/day)) / dose (g/day)</div>
+    <p><b>Option 1</b> — use the fixed Table 2 ppm limits, calculated with an assumed daily product mass of <b>10 g</b>. Valid for any formulation provided the daily dose ≤ 10 g; if all components meet Option 1, no further calculation is needed.</p>
+    <p><b>Option 2</b> — use the PDE (mg/day) with the <b>known maximum daily dose</b> and equation (1). Sum the solvent amount contributed by each component per day — the total must stay below the PDE. Products dosed at &gt; 10 g/day must be considered under Option 2.</p>
+    <p>If Option 2 fails after summation: test the drug product (formulation may reduce the level) → reduce the solvent in manufacture → only in exceptional cases, submit a summary of reduction efforts plus a <b>risk–benefit analysis</b>.</p>
+  </div>
+
+  <div class="card">
+    <h3 class="sub" style="margin-top:0">Analytical procedures &amp; reporting (Sections 3.4–3.5)</h3>
+    <div class="factbox"><b>What is new in R9 (24 Jan 2024):</b> a minor revision to Section 3.4 clarifying that <b>the impact of solvent volatility on the test method should be considered during validation</b> of residual-solvent methods.</div>
+    <ul class="clean">
+      <li>Residual solvents are typically determined by <b>gas chromatography</b>; use harmonised pharmacopoeial procedures if feasible, otherwise a validated alternative.</li>
+      <li>If <b>only Class 3 solvents</b> are present, a non-specific method such as <b>loss on drying</b> may be used if properly validated.</li>
+      <li>Method validation should conform to ICH <b>Q2</b> (Validation of Analytical Procedures).</li>
+      <li>Suppliers may report: only Class 3 likely → LoD &lt; 0.5%; Class 2 X, Y,… all below Option 1 limits (with or without Class 3 &lt; 0.5%). Class 1 solvents, if likely, must be <b>identified and quantified</b>. Solvents above their Option 1 limit (or 0.5% for Class 3) must be identified and quantified.</li>
+      <li>“Likely to be present” = used in the final manufacturing step, or used earlier and not consistently removed by a validated process.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ===================== TAB: SOLVENT TABLES ===================== -->
+<div class="panel" id="panel-tables">
+  <h2 class="sec">Solvent tables — limits from the guideline</h2>
+  <input class="searchbar" id="tblSearch" type="text" placeholder="🔍 Search solvents… (e.g. acetonitrile, 720, Class 2)" oninput="filterTables()">
+  <p class="lead" id="tblCount"></p>
+
+  <div class="card">
+    <h3 class="sub" style="margin-top:0">Table 1 · Class 1 — solvents to be avoided <span class="badge b-c1">CLASS 1</span></h3>
+    <table>
+      <thead><tr><th>Solvent</th><th>Concentration limit (ppm)</th><th>Concern</th></tr></thead>
+      <tbody id="t1body">
+        <tr class="crow"><td><b>Benzene</b></td><td>2</td><td>Carcinogen</td></tr>
+        <tr class="crow"><td><b>Carbon tetrachloride</b></td><td>4</td><td>Toxic and environmental hazard</td></tr>
+        <tr class="crow"><td><b>1,2-Dichloroethane</b></td><td>5</td><td>Toxic</td></tr>
+        <tr class="crow"><td><b>1,1-Dichloroethene</b></td><td>8</td><td>Toxic</td></tr>
+        <tr class="crow"><td><b>1,1,1-Trichloroethane</b></td><td>1500</td><td>Environmental hazard</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Class 1 solvents should not be employed unless unavoidable for a significant therapeutic advance; then restricted as above unless otherwise justified.</p>
+  </div>
+
+  <div class="card">
+    <h3 class="sub" style="margin-top:0">Table 2 · Class 2 — solvents to be limited <span class="badge b-c2">CLASS 2</span></h3>
+    <table>
+      <thead><tr><th>Solvent</th><th>PDE (mg/day)</th><th>Concentration limit (ppm)</th></tr></thead>
+      <tbody id="t2body"></tbody>
+    </table>
+    <p class="note">PDEs to the nearest 0.1 mg/day; concentrations to the nearest 10 ppm. Values do not reflect necessary analytical precision — precision is determined during method validation.</p>
+  </div>
+
+  <div class="card">
+    <h3 class="sub" style="margin-top:0">Table 3 · Class 3 — low toxic potential <span class="badge b-c3">CLASS 3</span></h3>
+    <p>Amounts ≤ <b>50 mg/day</b> (5000 ppm / 0.5% under Option 1) are acceptable without justification. No health-based exposure limit is needed.</p>
+    <table>
+      <thead><tr><th>Solvent</th></tr></thead>
+      <tbody id="t3body"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3 class="sub" style="margin-top:0">Table 4 — no adequate toxicological data found <span class="badge b-c4">TABLE 4</span></h3>
+    <p>Manufacturers should supply <b>justification for residual levels</b> of these solvents in pharmaceutical products.</p>
+    <table>
+      <thead><tr><th>Solvent</th></tr></thead>
+      <tbody id="t4body"></tbody>
+    </table>
+  </div>
+</div>
+  <!-- ===================== TAB: CALCULATORS ===================== -->
+  <div class="panel" id="panel-calculators">
+    <h2 class="sec">Calculators — live, with shown working</h2>
+    <p class="lead">All formulas and default values are taken from ICH Q3C(R9) (Section 3.3, Appendix 3, and PDE derivations in Parts II–VI). Results update live as you type.</p>
+
+    <!-- CALC 1: concentration limit -->
+    <div class="card" id="card-limit">
+      <h3 class="sub" style="margin-top:0">1 · Concentration limit from daily dose (Option 1 / Option 2)</h3>
+      <p class="lead">Equation (1): ppm = (1000 × PDE) ÷ dose (g/day). Option 1 assumes a 10 g/day product mass; enter your own daily dose for Option 2.</p>
+      <div class="twocol">
+        <div>
+          <label class="lbl">Solvent (Class 2)</label>
+          <select id="lcSolvent" onchange="limitCalc()"></select>
+          <label class="lbl">or custom PDE (mg/day)</label>
+          <input type="number" id="lcPDE" step="0.1" min="0" placeholder="e.g. 4.1" oninput="limitCalc()">
+          <label class="lbl">Maximum daily dose (g/day)</label>
+          <input type="number" id="lcDose" step="0.1" min="0.1" placeholder="e.g. 5" oninput="limitCalc()">
+        </div>
+        <div>
+          <div class="work" id="lcWork">—</div>
+          <div class="result info" id="lcRes"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALC 2: cumulative exposure -->
+    <div class="card" id="card-cum">
+      <h3 class="sub" style="margin-top:0">2 · Cumulative daily exposure — Option 2 summation across components</h3>
+      <p class="lead">Sum the solvent contributed by each component (drug substance + excipients). Exposure per component (mg/day) = amount (g) × content (ppm) ÷ 1000. Pass = total ≤ PDE.</p>
+      <div class="twocol">
+        <div>
+          <label class="lbl">Solvent (Class 2)</label>
+          <select id="cumSolvent" onchange="cumCalc()"></select>
+          <label class="lbl">Drug product daily dose (g)</label>
+          <input type="number" id="cumDose" step="0.1" min="0.1" value="5" oninput="cumCalc()">
+          <label class="lbl">Components</label>
+          <div id="cumRows"></div>
+          <div class="fdiv">
+            <button class="btn btn-s btn-sm" onclick="cumAddRow()">+ Add component</button>
+            <button class="btn btn-s btn-sm" onclick="cumExample(true)">Load passing example</button>
+            <button class="btn btn-s btn-sm" onclick="cumExample(false)">Load failing example</button>
+          </div>
+        </div>
+        <div>
+          <div class="work" id="cumWork">—</div>
+          <div class="result" id="cumRes"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALC 3: PDE derivation -->
+    <div class="card" id="card-pde">
+      <h3 class="sub" style="margin-top:0">3 · PDE derivation from a toxicity study (Appendix 3)</h3>
+      <p class="lead">PDE = (NOEL/LOEL × 50 kg) ÷ (F1 × F2 × F3 × F4 × F5) with F2 fixed at 10. Also gives the Option 1 ppm limit and an indicative class assignment (PDE ≥ 50 mg/day → Class 3 candidate, per the Part II–VI logic).</p>
+      <div class="twocol">
+        <div>
+          <label class="lbl">NOEL / LOEL (mg/kg/day)</label>
+          <input type="number" id="pdeNoel" step="any" min="0" placeholder="e.g. 50.7" oninput="pdeCalc()">
+          <label class="lbl">Body weight adjustment (kg)</label>
+          <input type="number" id="pdeBW" step="any" min="1" value="50" oninput="pdeCalc()">
+          <div class="twocol" style="gap:10px">
+            <div>
+              <label class="lbl">F1 — species</label>
+              <select id="pdeF1" onchange="pdeCalc()">
+                <option value="5">Rat (5)</option>
+                <option value="12">Mouse (12)</option>
+                <option value="2">Dog (2)</option>
+                <option value="2.5">Rabbit (2.5)</option>
+                <option value="3">Monkey (3)</option>
+                <option value="10">Other (10)</option>
+              </select>
+            </div>
+            <div>
+              <label class="lbl">F3 — study duration</label>
+              <select id="pdeF3" onchange="pdeCalc()">
+                <option value="1">≥ half lifetime / full organogenesis (1)</option>
+                <option value="2">6-mo rodent / 3.5-yr non-rodent (2)</option>
+                <option value="5">3-mo rodent / 2-yr non-rodent (5)</option>
+                <option value="10">Shorter duration (10)</option>
+              </select>
+            </div>
+          </div>
+          <label class="lbl">F4 — severity</label>
+          <select id="pdeF4" onchange="pdeCalc()">
+            <option value="1">No severe toxicity / fetal tox. with maternal tox. (1)</option>
+            <option value="5">Fetal tox. w/o maternal tox. / teratogenic with maternal tox. / neurotoxicity (5)</option>
+            <option value="10">Teratogenic without maternal tox. / oncogenic effect (10)</option>
+          </select>
+          <label class="lbl">F5 — NOEL vs LOEL</label>
+          <select id="pdeF5" onchange="pdeCalc()">
+            <option value="1">NOEL established (1)</option>
+            <option value="2">LOEL, mild severity (2)</option>
+            <option value="5">LOEL, moderate (5)</option>
+            <option value="10">LOEL, severe (10)</option>
+          </select>
+        </div>
+        <div>
+          <div class="work" id="pdeWork">—</div>
+          <div class="result" id="pdeRes"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALC 4: inhalation conversion -->
+    <div class="card" id="card-inh">
+      <h3 class="sub" style="margin-top:0">4 · Inhalation study → daily dose (ppm → mg/kg/day)</h3>
+      <p class="lead">The three-step conversion used for the THF, cumene, TEA and MIBK PDE derivations: ppm → mg/m³ (ideal gas, 24.45 L/mol) → continuous-exposure concentration → daily dose.</p>
+      <div class="twocol">
+        <div>
+          <label class="lbl">Exposure concentration (ppm)</label>
+          <input type="number" id="inhPpm" step="any" min="0" placeholder="e.g. 200" oninput="inhCalc()">
+          <label class="lbl">Molecular weight (g/mol)</label>
+          <input type="number" id="inhMw" step="any" min="1" placeholder="e.g. 72.10 (THF)" oninput="inhCalc()">
+          <div class="twocol" style="gap:10px">
+            <div><label class="lbl">Hours/day</label><input type="number" id="inhH" step="any" min="0.1" value="6" oninput="inhCalc()"></div>
+            <div><label class="lbl">Days/week</label><input type="number" id="inhD" step="any" min="0.1" value="5" oninput="inhCalc()"></div>
+          </div>
+          <div class="twocol" style="gap:10px">
+            <div><label class="lbl">Respiratory volume (L/day)</label><input type="number" id="inhRv" step="any" min="1" value="290" oninput="inhCalc()"></div>
+            <div><label class="lbl">Body weight (kg)</label><input type="number" id="inhBw" step="any" min="0.1" value="0.425" oninput="inhCalc()"></div>
+          </div>
+          <div class="fdiv"><button class="btn btn-s btn-sm" onclick="inhToPDE()">⇥ Feed this daily dose into the PDE calculator</button></div>
+          <p class="note">Physiological defaults from Table A3.1: rat 290 L/day &amp; 0.425 kg; mouse 43 L/day &amp; 0.028 kg; rabbit 1440 L/day &amp; 4 kg; human 28,800 L/day.</p>
+        </div>
+        <div>
+          <div class="work" id="inhWork">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALC 5: units converter -->
+    <div class="card" id="card-conv">
+      <h3 class="sub" style="margin-top:0">5 · Unit converter — ppm ⇄ mg/m³ (ideal gas)</h3>
+      <p class="lead">mg/m³ = ppm × MW ÷ 24.45 (1 atm, 25 °C); the guideline uses the same relation for ppm → mg/L (÷ 24,450 for mg/L since 1000 L = 1 m³).</p>
+      <div class="twocol">
+        <div>
+          <label class="lbl">Value (ppm)</label>
+          <input type="number" id="convPpm" step="any" min="0" placeholder="e.g. 200" oninput="convCalc()">
+        </div>
+        <div>
+          <label class="lbl">Molecular weight (g/mol)</label>
+          <input type="number" id="convMw" step="any" min="1" placeholder="e.g. 72.10" oninput="convCalc()">
+        </div>
+      </div>
+      <div class="work" id="convWork">—</div>
+    </div>
+  </div>
+
+  <!-- ===================== TAB: CASE STUDIES ===================== -->
+  <div class="panel" id="panel-cases">
+    <h2 class="sec">Case studies &amp; worked examples from the guideline</h2>
+    <p class="lead">Every example below reproduces the official numbers from ICH Q3C(R9) — the Section 3.3 summation examples and the PDE derivations in Parts II–VI. Use the calculator buttons to replay them.</p>
+
+    <div class="card">
+      <div class="caseh"><h4>Case 1 · Acetonitrile — Option 2 summation that passes</h4><span class="tag">Section 3.3</span></div>
+      <p>PDE for acetonitrile = 4.1 mg/day (Option 1 limit 410 ppm). Product daily mass 5.0 g; the drug substance and excipient 2 exceed the Option 1 limit, but the summed daily exposure stays below the PDE — the product <b>conforms</b>.</p>
+      <table>
+        <thead><tr><th>Component</th><th>Amount in formulation</th><th>Acetonitrile content</th><th>Daily exposure</th></tr></thead>
+        <tbody>
+          <tr><td>Drug substance</td><td>0.3 g</td><td>800 ppm</td><td>0.24 mg</td></tr>
+          <tr><td>Excipient 1</td><td>0.9 g</td><td>400 ppm</td><td>0.36 mg</td></tr>
+          <tr><td>Excipient 2</td><td>3.8 g</td><td>800 ppm</td><td>3.04 mg</td></tr>
+          <tr style="font-weight:700"><td>Drug product</td><td>5.0 g</td><td>728 ppm</td><td>3.64 mg ✓</td></tr>
+        </tbody>
+      </table>
+      <p class="note" style="color:var(--ok);font-weight:600">Result: 3.64 mg/day ≤ PDE 4.1 mg/day → conforms to the guideline.</p>
+      <div class="fdiv"><button class="btn btn-p btn-sm" onclick="cumExample(true)">▶ Replay in Calculator 2</button></div>
+    </div>
+
+    <div class="card">
+      <div class="caseh"><h4>Case 2 · Acetonitrile — Option 2 summation that fails</h4><span class="tag red">Section 3.3</span></div>
+      <p>Same 5.0 g product, but excipient 1 contains 2000 ppm acetonitrile. The total now <b>exceeds</b> both the Option 1 and Option 2 limits.</p>
+      <table>
+        <thead><tr><th>Component</th><th>Amount in formulation</th><th>Acetonitrile content</th><th>Daily exposure</th></tr></thead>
+        <tbody>
+          <tr><td>Drug substance</td><td>0.3 g</td><td>800 ppm</td><td>0.24 mg</td></tr>
+          <tr><td>Excipient 1</td><td>0.9 g</td><td>2000 ppm</td><td>1.80 mg</td></tr>
+          <tr><td>Excipient 2</td><td>3.8 g</td><td>800 ppm</td><td>3.04 mg</td></tr>
+          <tr style="font-weight:700"><td>Drug product</td><td>5.0 g</td><td>1016 ppm</td><td>5.08 mg ✗</td></tr>
+        </tbody>
+      </table>
+      <p class="note" style="color:var(--fail);font-weight:600">Result: 5.08 mg/day &gt; PDE 4.1 mg/day → fails. Remedy path per guideline: test the drug product (formulation may reduce the level) → reduce solvent in manufacture → exceptional case: risk–benefit summary.</p>
+      <div class="fdiv"><button class="btn btn-p btn-sm" onclick="cumExample(false)">▶ Replay in Calculator 2</button></div>
+    </div>
+
+    <div class="card">
+      <div class="caseh"><h4>Case 3 · Tetrahydrofuran (THF) — reclassified Class 3 → Class 2</h4><span class="tag t2">Part II · PDE 7.2 mg/day</span></div>
+      <p>Former PDE was 121 mg/day (Class 3). NTP 2-year inhalation studies (rats &amp; mice, 6 h/day, 5 days/week) showed carcinogenic activity (kidney tumours in male rats; liver tumours in female mice). PDE derived from the lowest exposure in the most sensitive species, male rat at 200 ppm:</p>
+      <div class="caseflow">200 ppm THF (MW 72.10) → 200 × 72.10 / 24.45 = 589.8 mg/m³ = 0.59 mg/L
+continuous dosing → 0.59 × (6/24) × (5/7) = 0.105 mg/L
+daily dose → 0.105 × 290 / 0.425 = 71.65 mg/kg/day
+PDE = 71.65 × 50 / (5 × 10 × 1 × 10 × 1) = 7.165 ≈ 7.2 mg/day
+Option 1 limit = 7.2 × 1000 / 10 = 720 ppm</div>
+      <p class="note">F1=5 (rat), F2=10, F3=1 (2-year), F4=10 (oncogenic effect), F5=1 (NOEL established). THF moved into Class 2 as a non-genotoxic carcinogen.</p>
+      <div class="fdiv"><button class="btn btn-p btn-sm" onclick="openInhCase(200,72.10,6,5,290,0.425,5,10,1)">▶ Replay in Calculators 4 + 3</button></div>
+    </div>
+
+    <div class="card">
+      <div class="caseh"><h4>Case 4 · Cumene — reclassified Class 3 → Class 2</h4><span class="tag t2">Part IV · PDE 0.70 mg/day</span></div>
+      <p>Former PDE 55 mg/day (Class 3). NTP 2-year inhalation studies showed rodent carcinogenicity. Calculated from female mouse LOEL 125 ppm (more conservative than the 150 ppm rat LOEL):</p>
+      <div class="caseflow">Mouse: 125 ppm × 120.19 / 24.45 = 614 mg/m³ = 0.61 mg/L
+0.61 × (6/24) × (5/7) = 0.11 mg/L → 0.11 × 43 / 0.028 = 169 mg/kg/day
+PDE = 169 × 50 / (12 × 10 × 1 × 10 × 10) = 0.70 mg/day → Limit 70 ppm</div>
+      <p class="note">F1=12 (mouse), F3=1 (105 weeks), F4=10 (oncogenic), F5=10 (NOEL not established — LOEL used). Cumene moved to Class 2.</p>
+      <div class="fdiv"><button class="btn btn-p btn-sm" onclick="openInhCase(125,120.19,6,5,43,0.028,12,10,10)">▶ Replay in Calculators 4 + 3</button></div>
+    </div>
+
+    <div class="card">
+      <div class="caseh"><h4>Case 5 · Methylisobutylketone (MIBK) — Class 3 → Class 2, two scenarios converge</h4><span class="tag t2">Part V · PDE 45 mg/day</span></div>
+      <p>Former PDE 100 mg/day (Class 3). NTP 2-year inhalation data (IARC group 2B). Two independent calculations both give ~45 mg/day: scenario 1 uses female-rat CPN LOEL 450 ppm; scenario 2 uses the tumour NOEL 900 ppm.</p>
+      <div class="caseflow">Scenario 1 (LOEL 450 ppm, CPN): 450 × 100.16 / 24.45 = 1843 mg/m³ = 1.843 mg/L
+1.843 × (6/24) × (5/7) = 0.329 mg/L → 0.329 × 290 / 0.425 = 225 mg/kg/day
+PDE = 225 × 50 / (5 × 10 × 1 × 1 × 5) = 45 mg/day → Limit 4500 ppm
+
+Scenario 2 (NOEL 900 ppm, tumours): → 449 mg/kg/day
+PDE = 449 × 50 / (5 × 10 × 1 × 10 × 1) = 44.9 ≈ 45 mg/day → Limit 4490 ppm</div>
+      <p class="note">Mouse liver tumours were CAR-mediated — not relevant to humans — so no mouse-based PDE was calculated. MIBK placed in Class 2.</p>
+      <div class="fdiv"><button class="btn btn-p btn-sm" onclick="openInhCase(450,100.16,6,5,290,0.425,5,1,5)">▶ Replay scenario 1 in Calculators 4 + 3</button></div>
+    </div>
+
+    <div class="card">
+      <div class="caseh"><h4>Case 6 · Triethylamine (TEA) — stays Class 3</h4><span class="tag t3">Part V · PDE 62.5 mg/day</span></div>
+      <p>Sub-chronic inhalation study in F344 rats: NOEL 247 ppm (28 weeks, 6 h/day, 5 days/week), no significant treatment-related effects.</p>
+      <div class="caseflow">247 × 101.19 / 24.45 = 1022.2 mg/m³ = 1.022 mg/L
+1.022 × (6/24) × (5/7) = 0.183 mg/L → 0.183 × 290 / 0.425 = 124.9 mg/kg/day
+PDE = 124.9 × 50 / (5 × 10 × 2 × 1 × 1) = 62.5 mg/day
+Limit (illustrative) = 62.5 × 1000 / 10 = 6250 ppm</div>
+      <p class="note">F3=2 (28 weeks). Since PDE &gt; 50 mg/day, TEA stays in Class 3 (“low toxic potential”) — no health-based limit required, but ≤ 0.5% / 5000 ppm under Option 1.</p>
+    </div>
+
+    <div class="card">
+      <div class="caseh"><h4>Case 7 · N-Methylpyrrolidone (NMP) — continues at Class 2</h4><span class="tag t2">Part III · PDE 5.3 mg/day</span></div>
+      <p>Prenatal inhalation study in Wistar rats (150 ppm, 6 h/day, GD 7–20): developmental neurotoxicity (impaired pre-weaning development, higher-cognitive deficits); NOEL not established.</p>
+      <div class="caseflow">150 × 99.13 / 24.45 = 608.16 mg/m³ = 0.608 mg/L
+0.608 × 6/24 = 0.152 mg/L → 0.152 × 290 / 0.33 = 133.58 mg/kg/day
+PDE = 133.58 × 50 / (5 × 10 × 1 × 5 × 5) = 5.3 mg/day → Limit 530 ppm</div>
+      <p class="note">F1=5 (rat), F3=1 (repro study covering organogenesis), F4=5 (fetal toxicity without maternal toxicity), F5=5 (LOEL). NMP remains in Class 2.</p>
+    </div>
+
+    <div class="card">
+      <div class="caseh"><h4>Case 8 · Part VI trio — 2-MTHF, CPME and TBA</h4><span class="tag">Parts VI · 2021</span></div>
+      <div class="casedata">
+        <div><span>2-Methyltetrahydrofuran</span><b>50 mg/day</b><span>Class 3 · NOEL 250 mg/kg/day (3-mo oral, reversible effects)</span></div>
+        <div><span>Cyclopentyl methyl ether</span><b>15 mg/day</b><span>Class 2 · 1500 ppm · NOEL 150 mg/kg/day (28-day oral)</span></div>
+        <div><span>Tertiary-butyl alcohol</span><b>35 mg/day</b><span>Class 2 · 3500 ppm · LOEL 175 mg/kg/day (2-yr rat nephropathy)</span></div>
+      </div>
+      <div class="caseflow">2-MTHF: 250 × 50 / (5 × 10 × 5 × 1 × 1) = 50 mg/day → Class 3 (PDE = 50)
+CPME:   150 × 50 / (5 × 10 × 10 × 1 × 1) = 15 mg/day → Class 2, limit 1500 ppm
+TBA:    175 × 50 / (5 × 10 × 1 × 1 × 5)  = 35 mg/day → Class 2, limit 3500 ppm
+(mouse thyroid-hyperplasia scenario for TBA gives 42.5 mg/day / 4250 ppm)</div>
+      <p class="note">TBA’s male-rat kidney tumours are α2u-globulin-nephropathy-mediated (not relevant to humans), so the female-rat nephropathy LOEL was used instead.</p>
+      <div class="fdiv"><button class="btn btn-p btn-sm" onclick="openPDE(250,50,5,5,1,1)">▶ Replay 2-MTHF in Calculator 3</button>
+      <button class="btn btn-p btn-sm" onclick="openPDE(150,50,5,10,1,1)">▶ Replay CPME in Calculator 3</button>
+      <button class="btn btn-p btn-sm" onclick="openPDE(175,50,5,1,1,5)">▶ Replay TBA in Calculator 3</button></div>
+    </div>
+
+    <div class="card">
+      <div class="caseh"><h4>Case 9 · Worked PDE derivation — acetonitrile (Appendix 3 example)</h4><span class="tag">Appendix 3</span></div>
+      <p>Mouse study (Pharmeuropa 1997, S24): NOEL = 50.7 mg/kg/day. This is the canonical worked example of the Appendix 3 method:</p>
+      <div class="caseflow">PDE = (50.7 mg/kg/day × 50 kg) / (12 × 10 × 5 × 1 × 1)
+     = 2535 / 600 = 4.22 ≈ 4.1 mg/day (Table 2)
+Option 1 limit = 4.1 × 1000 / 10 = 410 ppm</div>
+      <p class="note">F1=12 (mice→humans), F2=10 (inter-individual), F3=5 (13-week study), F4=1 (no severe toxicity), F5=1 (NOEL determined).</p>
+      <div class="fdiv"><button class="btn btn-p btn-sm" onclick="openPDE(50.7,50,12,5,1,1)">▶ Replay in Calculator 3</button></div>
+    </div>
+  </div>
+
+  <!-- ===================== TAB: REFERENCES ===================== -->
+  <div class="panel" id="panel-refs">
+    <h2 class="sec">References, glossary &amp; document history</h2>
+
+    <div class="card">
+      <h3 class="sub" style="margin-top:0">Document history of Q3C (timeline)</h3>
+      <table>
+        <thead><tr><th>Code</th><th>Milestone</th><th>Date</th></tr></thead>
+        <tbody>
+          <tr><td>Q3C</td><td>Step 2 approval &amp; public consultation</td><td>6 Nov 1996</td></tr>
+          <tr><td>Q3C</td><td>Step 4 — recommendation for adoption</td><td>17 Jul 1997</td></tr>
+          <tr><td>Q3C(R1)</td><td>PDE for Tetrahydrofuran revised based on new toxicology data</td><td>2000–2002</td></tr>
+          <tr><td>Q3C(R2)</td><td>PDE for N-Methylpyrrolidone revised</td><td>2000–2002</td></tr>
+          <tr><td>Q3C(R3)</td><td>Corrigendum to calculation formula; parent renamed Q3C(R3)</td><td>Nov 2005</td></tr>
+          <tr><td>Q3C(R4)</td><td>Tables 2, 3 &amp; Appendix 1 updated for NMP &amp; THF PDEs</td><td>Feb 2009</td></tr>
+          <tr><td>Q3C(R5)</td><td>PDE for Cumene (Part IV integrated)</td><td>4 Feb 2011</td></tr>
+          <tr><td>Q3C(R6)</td><td>PDE for Triethylamine &amp; Methylisobutylketone (Part V integrated)</td><td>9 Nov 2016</td></tr>
+          <tr><td>Q3C(R7)</td><td>Correction of the PDE for Ethyleneglycol — reverted back to R6 (Oct 2019)</td><td>15 Oct 2018</td></tr>
+          <tr><td>Q3C(R8)</td><td>PDEs for 2-MTHF, CPME, TBA (Part VI integrated); editorial corrections</td><td>22 Apr 2021 / 16 Aug 2022</td></tr>
+          <tr><td><b>Q3C(R9)</b></td><td><b>Minor revision to Section 3.4 — solvent volatility considered in analytical-method design/validation</b></td><td><b>24 Jan 2024</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 class="sub" style="margin-top:0">Glossary (from the guideline)</h3>
+      <table>
+        <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+        <tbody>
+          <tr><td><b>PDE</b> — Permitted Daily Exposure</td><td>Maximum acceptable intake per day of residual solvent in pharmaceutical products.</td></tr>
+          <tr><td><b>NOEL</b> — No-Observed-Effect Level</td><td>Highest dose with no biologically significant increases in frequency/severity of effects in exposed humans or animals.</td></tr>
+          <tr><td><b>LOEL</b> — Lowest-Observed-Effect Level</td><td>Lowest dose producing biologically significant increases in frequency/severity of any effects.</td></tr>
+          <tr><td><b>TDI / ADI</b></td><td>Tolerable (IPCS) / acceptable (WHO) daily intake — PDE is the pharmaceutically-specific analogue to avoid ADI confusion.</td></tr>
+          <tr><td><b>Genotoxic carcinogen</b></td><td>Carcinogen that produces cancer by affecting genes or chromosomes.</td></tr>
+          <tr><td><b>Strongly suspected human carcinogen</b></td><td>No epidemiological evidence, but positive genotoxicity data and clear rodent carcinogenicity evidence.</td></tr>
+          <tr><td><b>Neurotoxicity / Teratogenicity</b></td><td>Adverse effects on the nervous system / structural malformations in a developing fetus.</td></tr>
+          <tr><td><b>Reversible toxicity</b></td><td>Harmful effects that disappear after exposure ends.</td></tr>
+          <tr><td><b>Modifying factor</b></td><td>Factor determined by toxicologist judgement applied to bioassay data (F1–F5).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 class="sub" style="margin-top:0">Key source references cited by the guideline</h3>
+      <ul class="clean">
+        <li>Connelly JC, Hasegawa R, McArdle JV, Tucker ML. <i>ICH Guideline Residual Solvents.</i> Pharmeuropa (Suppl) 1997;9:57 — summary of toxicity data used to set the original PDEs.</li>
+        <li>NTP Toxicology and Carcinogenesis Studies of Cumene (CAS 98-82-8) in F344/N Rats and B6C3F1 Mice (Inhalation). Tech Rep Ser 2009;542.</li>
+        <li>NTP Toxicology and Carcinogenesis Studies of Methyl Isobutyl Ketone (CAS 108-10-1), Tech Rep Ser 2007;538; IARC Monographs 2012;101:305–24 (group 2B).</li>
+        <li>NTP Toxicology and Carcinogenesis Studies of tert-Butyl Alcohol (CAS 75-65-0), Tech Rep 436 (1995); McGregor D. Crit Rev Toxicol 2010;40(8):697–727.</li>
+        <li>Antonucci V, et al. Org Process Res Dev 2011;15:939–41; Parris P, et al. Regul Toxicol Pharmacol 2017;87:54–63 (2-MTHF).</li>
+        <li>Watanabe K. Molecules 2013;18:3183–94; Inoue K, et al. Fundam Toxicol Sci 2019;6:145–65 (CPME 28-day study).</li>
+        <li>WHO Environmental Health Criteria 170 (1994) — method adopted for PDE derivation; Gaylor &amp; Kodell, J Environ Pathology 4, 305 (1980) — Class 1 risk assessment.</li>
+      </ul>
+      <div class="factbox"><b>Status note:</b> This toolkit is an educational, interactive summary of the public ICH guideline text. For regulatory submissions, always verify against the official ICH Q3C(R9) Step 4 document (24 January 2024) — including its footnotes on each PDE revision.</div>
+    </div>
+  </div>
+  </main>
+  <footer>Educational interactive toolkit built from ICH Q3C(R9) “Impurities: Guideline for Residual Solvents” (Step 4, 24 Jan 2024). Not a regulatory document.</footer>
+  <script>
+  // ---------- DATA (from ICH Q3C(R9) Tables 1-4 & Appendix 1) ----------
+  var CLASS2 = [
+    ["Acetonitrile",4.1,410],["Chlorobenzene",3.6,360],["Chloroform",0.6,60],
+    ["Cumene",0.7,70],["Cyclohexane",38.8,3880],["Cyclopentyl methyl ether",15.0,1500],
+    ["1,2-Dichloroethene",18.7,1870],["Dichloromethane",6.0,600],["1,2-Dimethoxyethane",1.0,100],
+    ["N,N-Dimethylacetamide",10.9,1090],["N,N-Dimethylformamide",8.8,880],["1,4-Dioxane",3.8,380],
+    ["2-Ethoxyethanol",1.6,160],["Ethyleneglycol",6.2,620],["Formamide",2.2,220],
+    ["Hexane",2.9,290],["Methanol",30.0,3000],["2-Methoxyethanol",0.5,50],
+    ["Methylbutyl ketone",0.5,50],["Methylcyclohexane",11.8,1180],["Methylisobutylketone",45,4500],
+    ["N-Methylpyrrolidone",5.3,530],["Nitromethane",0.5,50],["Pyridine",2.0,200],
+    ["Sulfolane",1.6,160],["Tertiary-butyl alcohol",35,3500],["Tetrahydrofuran",7.2,720],
+    ["Tetralin",1.0,100],["Toluene",8.9,890],["1,1,2-Trichloroethene",0.8,80],
+    ["Xylene (60% m-, 14% p-, 9% o- + 17% ethylbenzene)",21.7,2170]
+  ];
+  var CLASS3 = ["Acetic acid","Acetone","Anisole","1-Butanol","2-Butanol","Butyl acetate","tert-Butylmethyl ether",
+    "Dimethyl sulfoxide","Ethanol","Ethyl acetate","Ethyl ether","Ethyl formate","Formic acid","Heptane",
+    "Isobutyl acetate","Isopropyl acetate","Methyl acetate","3-Methyl-1-butanol","Methylethyl ketone",
+    "2-Methyl-1-propanol","2-Methyltetrahydrofuran","Pentane","1-Pentanol","1-Propanol","2-Propanol",
+    "Propyl acetate","Triethylamine"];
+  var TABLE4 = ["1,1-Diethoxypropane","1,1-Dimethoxymethane","2,2-Dimethoxypropane","Isooctane","Isopropyl ether",
+    "Methylisopropyl ketone","Petroleum ether","Trichloroacetic acid","Trifluoroacetic acid"];
+
+  // ---------- TAB SWITCHING ----------
+  function showTab(name){
+    var tabs={guidelines:'panel-guidelines',tables:'panel-tables',calculators:'panel-calculators',cases:'panel-cases',refs:'panel-refs'};
+    var btns=document.querySelectorAll('nav.tabs button');
+    for(var i=0;i<btns.length;i++){btns[i].classList.toggle('active',btns[i].getAttribute('onclick').indexOf(name)>-1);}
+    for(var key in tabs){document.getElementById(tabs[key]).classList.toggle('active',key===name);}
+    window.scrollTo({top:0,behavior:'smooth'});
+    if(name==='calculators'){limitCalc();cumCalc();pdeCalc();inhCalc();convCalc();}
+  }
+  function fmt(n,d){var p=Math.pow(10,d||2);var v=Math.round(n*p)/p;return v.toLocaleString('en-US',{maximumFractionDigits:d||2});}
+
+  // ---------- SOLVENT TABLES ----------
+  function buildTables(){
+    var h='';
+    for(var i=0;i<CLASS2.length;i++){h+='<tr class="crow"><td><b>'+CLASS2[i][0]+'</b></td><td>'+CLASS2[i][1]+'</td><td>'+CLASS2[i][2]+'</td></tr>';}
+    document.getElementById('t2body').innerHTML=h;
+    h='';
+    for(var j=0;j<CLASS3.length;j++){h+='<tr class="crow"><td>'+CLASS3[j]+'</td></tr>';}
+    document.getElementById('t3body').innerHTML=h;
+    h='';
+    for(var k=0;k<TABLE4.length;k++){h+='<tr class="crow"><td>'+TABLE4[k]+'</td></tr>';}
+    document.getElementById('t4body').innerHTML=h;
+    filterTables();
+  }
+  function filterTables(){
+    var q=document.getElementById('tblSearch').value.toLowerCase();
+    var rows=document.querySelectorAll('#panel-tables tbody tr.crow');
+    var shown=0;
+    for(var i=0;i<rows.length;i++){
+      var ok=rows[i].textContent.toLowerCase().indexOf(q)>-1;
+      rows[i].style.display=ok?'':'none';
+      if(ok){shown++;}
+    }
+    document.getElementById('tblCount').textContent=shown+' of '+rows.length+' solvents shown';
+  }
+
+  // ---------- SOLVENT SELECTS ----------
+  function fillSelects(){
+    var opts='';
+    for(var i=0;i<CLASS2.length;i++){opts+='<option value="'+i+'">'+CLASS2[i][0]+' (PDE '+CLASS2[i][1]+' mg/day)</option>';}
+    document.getElementById('lcSolvent').innerHTML=opts;
+    document.getElementById('cumSolvent').innerHTML=opts;
+    document.getElementById('lcSolvent').value=0;
+    document.getElementById('cumSolvent').value=0;
+  }
+
+  // ---------- CALC 1: LIMIT ----------
+  function limitCalc(){
+    var idx=parseInt(document.getElementById('lcSolvent').value||0,10);
+    var pde=parseFloat(document.getElementById('lcPDE').value)||0;
+    if(!pde){pde=CLASS2[idx][1];}
+    var dose=parseFloat(document.getElementById('lcDose').value)||0;
+    if(pde<=0||dose<=0){document.getElementById('lcWork').textContent='Enter a PDE and a daily dose (g) to compute the limit.';return;}
+    var ppm=1000*pde/dose;
+    var opt1=1000*pde/10;
+    var w='Equation (1):  ppm = (1000 × PDE) ÷ dose\n= (1000 × '+pde+') ÷ '+dose+' = '+fmt(ppm,0)+' ppm\n\nOption 1 reference (10 g/day) = '+fmt(opt1,0)+' ppm';
+    document.getElementById('lcWork').textContent=w;
+    var r=document.getElementById('lcRes');
+    r.className='result show info';
+    r.innerHTML='<b>Concentration limit for a '+dose+' g/day dose: '+fmt(ppm,0)+' ppm</b><br>PDE = '+pde+' mg/day.'+(dose>10?' <br><b>Note:</b> daily dose > 10 g → must be evaluated under <b>Option 2</b> per Section 3.3.':'');
+  }
+
+  // ---------- CALC 2: CUMULATIVE ----------
+  var cumRow=0;
+  function cumRowHTML(name,amt,ppm){
+    return '<tr>'+
+      '<td><input type="text" class="r-name" value="'+(name||'')+'" placeholder="Component" oninput="cumCalc()"></td>'+
+      '<td><input type="number" class="r-amt" step="any" min="0" value="'+(amt||'')+'" placeholder="g" oninput="cumCalc()"></td>'+
+      '<td><input type="number" class="r-ppm" step="any" min="0" value="'+(ppm||'')+'" placeholder="ppm" oninput="cumCalc()"></td>'+
+      '<td><button class="btn btn-s btn-sm" onclick="this.closest(\'tr\').remove();cumCalc()">✕</button></td></tr>';
+  }
+  function cumAddRow(name,amt,ppm){document.getElementById('cumRows').insertAdjacentHTML('beforeend','<tr>'+cumRowHTML(name,amt,ppm)+'</tr>');cumCalc();}
+  function cumExample(pass){
+    document.getElementById('cumRows').innerHTML='';
+    if(pass){cumAddRow('Drug substance',0.3,800);cumAddRow('Excipient 1',0.9,400);cumAddRow('Excipient 2',3.8,800);}
+    else{cumAddRow('Drug substance',0.3,800);cumAddRow('Excipient 1',0.9,2000);cumAddRow('Excipient 2',3.8,800);}
+    document.getElementById('cumDose').value=5;
+    var s=document.getElementById('cumSolvent');
+    for(var i=0;i<CLASS2.length;i++){if(CLASS2[i][0]==='Acetonitrile'){s.value=i;}}
+    cumCalc();
+  }
+  function cumCalc(){
+    var idx=parseInt(document.getElementById('cumSolvent').value||0,10);
+    var pde=CLASS2[idx][1];
+    var dose=parseFloat(document.getElementById('cumDose').value)||0;
+    var rows=document.querySelectorAll('#cumRows tr');
+    var total=0,lines=[],ok=true;
+    if(rows.length===0){document.getElementById('cumWork').textContent='Add components (drug substance + excipients) to sum the daily exposure.';document.getElementById('cumRes').className='result';return;}
+    var prodppm=0;
+    for(var i=0;i<rows.length;i++){
+      var amt=parseFloat(rows[i].querySelector('.r-amt').value)||0;
+      var ppm=parseFloat(rows[i].querySelector('.r-ppm').value)||0;
+      var name=rows[i].querySelector('.r-name').value||('Component '+(i+1));
+      var exp=amt*ppm/1000;
+      total+=exp;
+      lines.push(name+': '+amt+' g × '+ppm+' ppm ÷ 1000 = '+fmt(exp,2)+' mg/day');
+    }
+    if(dose>0){prodppm=total*1000/dose;}
+    lines.push('—'.repeat(28));
+    lines.push('Total daily exposure = '+fmt(total,2)+' mg/day');
+    if(dose>0){lines.push('Product-level mean = '+fmt(prodppm,0)+' ppm (over '+dose+' g/day)');}
+    lines.push('PDE ('+CLASS2[idx][0]+') = '+pde+' mg/day');
+    document.getElementById('cumWork').textContent=lines.join('\n');
+    var r=document.getElementById('cumRes');
+    if(total<=pde){
+      r.className='result show ok';
+      r.innerHTML='<b>✓ PASS — total '+fmt(total,2)+' mg/day ≤ PDE '+pde+' mg/day.</b><br>Formulation conforms to Option 2. No drug-product testing required.';
+    }else{
+      r.className='result show fail';
+      r.innerHTML='<b>✗ FAIL — total '+fmt(total,2)+' mg/day &gt; PDE '+pde+' mg/day.</b><br>Remedy per Section 3.3: (1) test the drug product — formulation may reduce the level; (2) reduce the solvent in manufacture; (3) exceptional case only: risk–benefit summary to support a higher level.';
+    }
+  }
+
+  // ---------- CALC 3: PDE ----------
+  function pdeCalc(){
+    var noel=parseFloat(document.getElementById('pdeNoel').value)||0;
+    var bw=parseFloat(document.getElementById('pdeBW').value)||0;
+    var f1=parseFloat(document.getElementById('pdeF1').value);
+    var f2=10;
+    var f3=parseFloat(document.getElementById('pdeF3').value);
+    var f4=parseFloat(document.getElementById('pdeF4').value);
+    var f5=parseFloat(document.getElementById('pdeF5').value);
+    if(noel<=0||bw<=0){document.getElementById('pdeWork').textContent='Enter the NOEL/LOEL (mg/kg/day) and body-weight adjustment.';document.getElementById('pdeRes').className='result';return;}
+    var pde=noel*bw/(f1*f2*f3*f4*f5);
+    var w='PDE = (NOEL/LOEL × body weight) ÷ (F1×F2×F3×F4×F5)\n     = ('+noel+' × '+bw+') ÷ ('+f1+' × '+f2+' × '+f3+' × '+f4+' × '+f5+')\n     = '+(noel*bw)+' ÷ '+(f1*f2*f3*f4*f5)+'\n     = '+fmt(pde,2)+' mg/day\nOption 1 limit = '+fmt(pde*100,0)+' ppm (10 g/day)';
+    document.getElementById('pdeWork').textContent=w;
+    var r=document.getElementById('pdeRes');
+    var cls=(pde>=50)?'Class 3 candidate (PDE ≥ 50 mg/day — low toxic potential)':'Class 2 candidate (PDE < 50 mg/day — limit via Table 2)';
+    var part= pde>=50? 'info':'info';
+    r.className='result show info';
+    r.innerHTML='<b>PDE = '+fmt(pde,2)+' mg/day</b><br>'+cls+' (final class also depends on the toxicity profile — cf. Parts II–VI).';
+  }
+
+  // ---------- CALC 4: INHALATION ----------
+  function inhCalc(){
+    var ppm=parseFloat(document.getElementById('inhPpm').value)||0;
+    var mw=parseFloat(document.getElementById('inhMw').value)||0;
+    var h=parseFloat(document.getElementById('inhH').value)||0;
+    var d=parseFloat(document.getElementById('inhD').value)||0;
+    var rv=parseFloat(document.getElementById('inhRv').value)||0;
+    var bw=parseFloat(document.getElementById('inhBw').value)||0;
+    if(!ppm||!mw||!h||!d||!rv||!bw){document.getElementById('inhWork').textContent='Fill in all six fields to run the conversion chain.';return;}
+    var mgm3=ppm*mw/24.45;
+    var mgl=mgm3/1000;
+    var cont=mgl*(h/24)*(d/7);
+    var dose=cont*rv/bw;
+    var w='Step 1 — ppm → mg/m³:   '+ppm+' × '+mw+' ÷ 24.45 = '+fmt(mgm3,2)+' mg/m³ = '+fmt(mgl,3)+' mg/L\nStep 2 — continuous dosing:   '+fmt(mgl,3)+' × ('+h+'/24) × ('+d+'/7) = '+fmt(cont,4)+' mg/L\nStep 3 — daily dose:   '+fmt(cont,4)+' × '+rv+' ÷ '+bw+' = '+fmt(dose,2)+' mg/kg/day';
+    document.getElementById('inhWork').textContent=w;
+  }
+  function inhToPDE(){
+    var rv=parseFloat(document.getElementById('inhRv').value)||290;
+    var bw=parseFloat(document.getElementById('inhBw').value)||0.425;
+    var ppm=parseFloat(document.getElementById('inhPpm').value)||0;
+    var mw=parseFloat(document.getElementById('inhMw').value)||0;
+    var h=parseFloat(document.getElementById('inhH').value)||6;
+    var d=parseFloat(document.getElementById('inhD').value)||5;
+    if(!ppm||!mw){return;}
+    var dose=(ppm*mw/24450)*(h/24)*(d/7)*rv/bw;
+    document.getElementById('pdeNoel').value=Math.round(dose*100)/100;
+    showTab('calculators');
+    document.getElementById('card-pde').scrollIntoView({behavior:'smooth'});
+    pdeCalc();
+  }
+
+  // ---------- CALC 5: CONVERTER ----------
+  function convCalc(){
+    var ppm=parseFloat(document.getElementById('convPpm').value)||0;
+    var mw=parseFloat(document.getElementById('convMw').value)||0;
+    if(!ppm||!mw){document.getElementById('convWork').textContent='Enter a ppm value and the molecular weight.';return;}
+    var mgm3=ppm*mw/24.45;
+    document.getElementById('convWork').textContent=ppm+' ppm × '+mw+' ÷ 24.45 = '+fmt(mgm3,2)+' mg/m³ = '+fmt(mgm3/1000,4)+' mg/L\n(reverse: '+fmt(mgm3,2)+' mg/m³ ÷ '+mw+' × 24.45 = '+fmt(mgm3*24.45/mw,1)+' ppm)';
+  }
+
+  // ---------- CASE-STUDY REPLAY HELPERS ----------
+  function openPDE(noel,bw,f1,f3,f4,f5){
+    document.getElementById('pdeNoel').value=noel;
+    document.getElementById('pdeBW').value=bw;
+    document.getElementById('pdeF1').value=String(f1);
+    document.getElementById('pdeF3').value=String(f3);
+    document.getElementById('pdeF4').value=String(f4);
+    document.getElementById('pdeF5').value=String(f5);
+    showTab('calculators');
+    document.getElementById('card-pde').scrollIntoView({behavior:'smooth'});
+    pdeCalc();
+  }
+  function openInhCase(ppm,mw,h,d,rv,bw,f1,f4,f5){
+    document.getElementById('inhPpm').value=ppm;
+    document.getElementById('inhMw').value=mw;
+    document.getElementById('inhH').value=h;
+    document.getElementById('inhD').value=d;
+    document.getElementById('inhRv').value=rv;
+    document.getElementById('inhBw').value=bw;
+    showTab('calculators');
+    document.getElementById('card-inh').scrollIntoView({behavior:'smooth'});
+    inhCalc();
+    document.getElementById('pdeF1').value=String(f1);
+    document.getElementById('pdeF4').value=String(f4);
+    document.getElementById('pdeF5').value=String(f5);
+    inhToPDE();
+  }
+
+  // ---------- INIT ----------
+  document.addEventListener('DOMContentLoaded',function(){
+    buildTables();fillSelects();
+    document.getElementById('pdeF1').value='5';document.getElementById('pdeF3').value='5';
+    document.getElementById('pdeF4').value='1';document.getElementById('pdeF5').value='1';
+    document.getElementById('lcDose').value=10;
+    limitCalc();cumCalc();pdeCalc();inhCalc();convCalc();
+  });
+  </script>
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+  </html>
